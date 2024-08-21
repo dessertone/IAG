@@ -1,6 +1,7 @@
 {
   "DataPath": "sample.json",
-  "GenerationPath": "F:\\Temp\\model\\result.json",
+  "GenerationPath": "F:\\Temp\\model\\result2.json",
+  "ProcessNum": 1000,
   "Questions": [
     " Can you provide a comprehensive description of the image?",
     " Elaborate on the details of the image.",

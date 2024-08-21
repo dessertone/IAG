@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ShellProgressBar;
 #nullable disable
 
 namespace IAG
@@ -30,8 +31,8 @@ namespace IAG
             "Come up with 6 instructions for the image with different styles and accurate answers. " +
             "The generated instruction-answer pairs should be reasonable and instruction should not imply answer" +
             "The instructions should contain interrogative sentences" +
-            "The answers should not be just a word and less than 30 words." +
             "nothing should be answered such as explanation neither any comment. " +
+            "The answers should be no less than 3 words." +
             "Output instruction-answer pair should as follows json format,put all of them in a single json" +
             "{Instruction: ,Answer:} * 6";
 
@@ -72,7 +73,8 @@ namespace IAG
             {
                 InitConfig(args);
                 var info = await DataPreparation();
-                var data = (info["images"] as JArray)!.Take(8);
+                var data = (info["images"] as JArray)!.Take(arg.ProcessNum);
+                
                 var options = new ParallelOptions
                 {
                     MaxDegreeOfParallelism = arg.MaxThreadNum
@@ -83,10 +85,12 @@ namespace IAG
                     ApiKey = arg.API_KEY!,
                     Url = arg.url!,
                     Content = positivePrompt
-                };
+                }; 
+                using var processBar = new ProgressBar(arg.ProcessNum, "processing data", ConsoleColor.White);
                 var pLResult = Parallel.ForEach(data!, options, d =>
                 {
                     var tuple = rs.GetRequestAsync(requestOption, d["coco_url"].ToString()).GetAwaiter().GetResult();
+                    processBar.Tick();
                     var verifyOptions = new GetRequestOptions
                     {
                         ApiFormat = GLM4VFormat,
@@ -118,6 +122,8 @@ namespace IAG
         
         static void SaveResult()
         {
+            if(!File.Exists(arg.GenerationPath))
+                File.Create(arg.GenerationPath!).Close();
             using var writer = new StreamWriter(arg.GenerationPath!);
             writer.Write(JsonConvert.SerializeObject(res));
         }
@@ -131,12 +137,12 @@ namespace IAG
             arg = configuration.Get<Args>() ?? throw new KeyNotFoundException("args not found");
             questions = configuration.GetSection("Questions").Get<List<string>>();
             count = questions.Count;
-        }
+        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
 
         static async Task<JObject> DataPreparation()
         {
             using var reader = new StreamReader(arg.DataPath!);
-    
+          
             var cts = new CancellationTokenSource(5000);
             var token = cts.Token;
             using var progressBar = new ConsoleBar(50, "loading data");
@@ -168,7 +174,7 @@ namespace IAG
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(e.Message);
             }
         }
     }

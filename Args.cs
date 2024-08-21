@@ -7,4 +7,5 @@ public class Args
     public string? GenerationPath { get; set; }
     public string? API_KEY { get; set; }
     public string? url { get; set; }
+    public int ProcessNum { get; set; }
 }
