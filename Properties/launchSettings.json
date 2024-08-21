@@ -1,5 +1,5 @@
 {
-  "MaxThreadNum": 8,
-  "API_KEY": "6f4365e9cd36dfe935b747dce4915efa.B1Ru1IzW8zzF8HrV",
+  "MaxThreadNum": 16,
+  "API_KEY": "your_api_key",
   "url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 }
